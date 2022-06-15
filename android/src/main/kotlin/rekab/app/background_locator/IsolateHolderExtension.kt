@@ -38,10 +38,10 @@ internal fun IsolateHolderService.startLocatorService(context: Context) {
         }
     }
 
-    backgroundChannel =
-            MethodChannel(IsolateHolderService.backgroundEngine?.dartExecutor?.binaryMessenger,
-                    Keys.BACKGROUND_CHANNEL_ID)
-    backgroundChannel.setMethodCallHandler(this)
+    IsolateHolderService.backgroundEngine?.dartExecutor?.binaryMessenger?.let {
+        backgroundChannel = MethodChannel(it, Keys.BACKGROUND_CHANNEL_ID)
+        backgroundChannel.setMethodCallHandler(this)
+    }
 }
 
 fun getLocationRequest(intent: Intent): LocationRequestOptions {

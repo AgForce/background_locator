@@ -19,13 +19,14 @@ class InitPluggable : Pluggable {
         if (!isInitCallbackCalled) {
             (PreferencesManager.getCallbackHandle(context, Keys.INIT_CALLBACK_HANDLE_KEY))?.let { initCallback ->
                 val initialDataMap = PreferencesManager.getDataCallback(context, Keys.INIT_DATA_CALLBACK_KEY)
-                val backgroundChannel = MethodChannel(IsolateHolderService.backgroundEngine?.dartExecutor?.binaryMessenger,
-                        Keys.BACKGROUND_CHANNEL_ID)
-                Handler(context.mainLooper)
+                IsolateHolderService.backgroundEngine?.dartExecutor?.binaryMessenger?.let { binaryMessenger ->
+                    val backgroundChannel = MethodChannel(binaryMessenger, Keys.BACKGROUND_CHANNEL_ID)
+                    Handler(context.mainLooper)
                         .post {
                             backgroundChannel.invokeMethod(Keys.BCM_INIT,
-                                    hashMapOf(Keys.ARG_INIT_CALLBACK to initCallback, Keys.ARG_INIT_DATA_CALLBACK to initialDataMap))
+                                hashMapOf(Keys.ARG_INIT_CALLBACK to initCallback, Keys.ARG_INIT_DATA_CALLBACK to initialDataMap))
                         }
+                }
             }
             isInitCallbackCalled = true
         }
