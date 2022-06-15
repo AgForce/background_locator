@@ -23,8 +23,6 @@ class AndroidLocationProviderClient(context: Context, override var listener: Loc
 
     @SuppressLint("MissingPermission")
     override fun requestLocationUpdates(request: LocationRequestOptions) {
-        var gpsLocation: Location? = null
-        var networkLocation: Location? = null
         timeBetweenLocation = request.interval
         if (client?.isProviderEnabled(LocationManager.GPS_PROVIDER) == true) {
             client.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -32,25 +30,8 @@ class AndroidLocationProviderClient(context: Context, override var listener: Loc
                     request.distanceFilter,
                     this)
         }
-        if (client?.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == true) {
-            client.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                    request.interval,
-                    request.distanceFilter,
-                    this)
-        }
-        gpsLocation = client?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        networkLocation = client?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-        // return the android device last Location after start request location
-        if (gpsLocation != null && networkLocation != null) {
-            if (gpsLocation.time < networkLocation.time) {
-                onLocationChanged(networkLocation)
-            } else {
-                onLocationChanged(gpsLocation)
-            }
-        } else if (gpsLocation != null) {
-            onLocationChanged(gpsLocation)
-        } else if (networkLocation != null) {
-            onLocationChanged(networkLocation)
+        client?.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let {
+            onLocationChanged(it);
         }
     }
 
